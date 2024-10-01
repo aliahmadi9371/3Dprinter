@@ -1,0 +1,1 @@
+protoc --proto_path=C:\Qt\git\client-desktop\Protobuf --cpp_out=C:\Qt\git\client-desktop\Protobuf message.proto

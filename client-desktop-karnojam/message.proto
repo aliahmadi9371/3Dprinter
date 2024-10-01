@@ -1,0 +1,231 @@
+syntax = "proto3";
+package network_messages;
+
+message NetServerCommands {   
+      uint32 packetCode = 20;
+      enum PacketType {
+        ZeroPacketCode = 0;
+        Projector = 1;
+        Print = 2;
+        MachinStatus = 3;
+        Material = 4;
+        Motion = 5;
+        LicenseStatus = 6;
+        Job = 7;
+        Config = 8;
+        LicenseKey = 9;
+        ManualMV = 10;
+        GetState = 11;
+      }
+
+      uint32 iCalibrState = 1;
+      enum ProjectorCalibrate {
+        ZeroCalibrate = 0;
+        StartCalibrate = 7;
+        FinishCalibrate = 8;
+        GoHomeCalibrate = 0xffff11;
+        PositionCalibrate = 0xffff21;
+        LEDIntensityCalibrate= 0xffff91;
+        MaterialTestCalibrate = 0xffff81;
+        ProjectorOffCalibrate = 9;
+        EjectUpCalibrate = 0xffff31;
+        EjectDownCalibrate = 0xffff32;
+        LEDTurnOn = 11;
+        LEDTurnOff = 12;
+        ShowPattern = 13;
+	MaterialLevel = 14;
+	VacuumFill = 15;
+	GetSensor = 16;
+      }
+
+      uint32 iGoPos = 2;
+      float fMaterialLevelmm = 18;
+      float fFillVacuumSec = 19;
+
+      uint32 iPrintState = 3;
+      enum PrintState {
+        ZeroPirint = 0;
+        StartPrint = 11;
+        StopPrint = 12;
+        PausePrint = 13;
+      }
+
+      uint32 iMachineStatus = 4;   // idle = 0   printing = 1  Calibrating = 2
+      uint32 getstatus = 5;
+      uint32 materialId = 6;
+      uint32 motionId = 7;
+      uint32 jobId = 23;
+
+      uint32 iManualMV = 8;
+      enum ManualMVStep {
+        ZeroManualMV = 0;
+        BuidlOneUp = 101;
+        BuidlOneDown = 102;
+        BuidlTenUp = 111;
+        BuidlTenDown = 112;
+        BuidlFiftyUp = 121;
+        BuidlFiftyDown = 122;
+        TiltUp = 13;
+        TiltDown = 14;
+        DoorUp = 15;
+        DoorDown = 16;
+      }
+      
+
+      uint32 iMatPat = 9;
+      uint32 iLicenseStatus = 10;  // 1 = ok    2 = Wrong Name   3 = License Expired
+      uint32 iRenewLicense = 11;  
+      repeated bytes iRequestedCode = 12; // char[8]
+      repeated bytes iLicenseKey = 13;   // char[8]
+
+      MachineConfig machineConf = 14;
+      MaterialConfig materialConfig = 15;
+      MotionConfig motionConfig = 16;
+      Job3D job3D = 17;
+};
+
+message NetClientRes {   
+      uint32 packetCode = 1;
+      enum PacketType {
+        ZeroPacketCode = 0;
+        NotFound = 1;
+        Founded = 2;
+        Done = 3;
+        Error = 4;
+        Progress = 5;
+        Ready = 6;
+	ReadVal = 7;
+        CheckFile = 8;
+      }
+      repeated MachineConfig confs = 2;
+      repeated MaterialConfig materials = 3;
+      repeated MotionConfig motions = 4;
+      repeated Job3D jobs = 5;
+      string errorMesg = 6;
+      uint32 progress = 7;
+      uint64 size = 8;
+      uint32 currentSlice = 9;
+      uint32 totalSlice = 10;
+      uint64 remaining_time = 12;
+      float sensorVal = 13;
+      repeated bytes fileBytes = 11; // [1024]
+
+      bytes Md5 = 14; 
+};
+
+message PrintProgress {
+
+}
+
+message MachineConfig {
+    uint32 packetCode = 1;
+    enum PacketType {
+        ZeroPacketCode = 0;
+        Add = 1;
+        Edit = 2;
+        Delete = 3;
+        Get = 4;
+        GetALL = 5;
+        SET = 6;
+    }
+      
+    uint32 ModelCode = 2;
+    string  MachineNo = 3;  // [32]
+    uint32  Version = 4;
+    uint32  SubVersion = 5;
+    bool  NeedLicense = 6;  // 0 = NO
+    bool  HasDoor = 13;;  // 0 = NO
+    bool  HasErm = 14;;  // 0 = NO
+    bool  BUpTDownConfig = 17;  // 0 = Bottom Up (DLP)      1 = Top Down (SLA)
+    float PrinterUnit = 7;  // 1.25
+    uint32 ZUpperLimit = 8;
+    uint32 ProjectorProtocol = 9;
+    uint32 NoOfMaskPoints = 10;
+    uint32 MaxIntensity = 11;
+    uint32 MinIntensity = 12;
+    uint32 gProjectWidth = 15;
+    uint32 gProjectHeight = 16;
+    uint32 rowId = 18;
+
+    uint32 MaxIntensitySensor = 27;
+    uint32 MinIntensitySensor = 28;
+
+    bool HasPlunger = 19;
+    uint32 TDownZHomePos = 20;
+    float vacuumTimer = 21;
+    float SensorSetPointVacuum = 22;
+    float SensorSetPoint = 23;
+    float SensorThreshold = 24;
+    float XShift = 25;
+    float YShift = 26;
+};
+
+message MaterialConfig {
+    uint32 packetCode = 1;
+    enum PacketType {
+        ZeroPacketCode = 0;
+        Add = 1;
+        Edit = 2;
+        Delete = 3;
+        Get = 4;
+        GetALL = 5;
+    }
+    string Name = 2; //  [10]
+    uint32 LayerThickness = 3;
+    uint32 BurnInLayers = 4;
+    float BurnInCureTime = 5;
+    float NormalCureTime = 6;
+    float BurnIntensity = 7;
+    float Intensity = 8;
+    uint32 rowId = 9;
+};
+
+message MotionConfig {
+    uint32 packetCode = 1;
+    enum PacketType {
+      ZeroPacketCode = 0;
+        Add = 1;
+        Edit = 2;
+        Delete = 3;
+        Get = 4;
+        GetALL = 5;
+    }
+    string Name = 2; // [10]
+    repeated uint32 Layer_Z_Raise = 3; // [2]
+    repeated uint32 Layer_Z_Lower = 4; // [2]
+    repeated uint32 Layer_Tilt_Raise = 5; // [2]
+    repeated uint32 Layer_Tilt_Lower = 6; // [2]
+    repeated uint32 Layer_Overlift = 7; // [2]
+    repeated uint32 Layer_Breathe = 8; // [2]
+    repeated uint32 Layer_Settle = 9; // [2]
+    repeated uint32 Layer_Tilt_Percent = 10; // [2]
+    uint32 Cut_Off_Layers = 11;
+    uint32 Final_OverLift = 12;
+    uint32 Base_Layer_settle = 13;
+    uint32 rowId = 14;
+};
+
+
+message Job3D
+{
+	uint32 packetCode = 1;
+	enum PacketType {
+		ZeroPacketCode = 0;
+		Add = 1;
+		Edit = 2;
+		Delete = 3;
+		Get = 4;
+		GetALL = 5;
+		CheckFile = 6;
+	}
+	string Name = 2;
+	uint64 Size = 3;
+	bool lastPacket = 4;
+	repeated bytes fileBytes = 5; // [1024]
+	uint32 rowId = 6;
+	bool Md5 = 7;
+};
+
+
+
+
