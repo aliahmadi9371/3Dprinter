@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>images/project_mask.png</file>
+        <file>images/black.png</file>
+        <file>images/Red.png</file>
+    </qresource>
+</RCC>
